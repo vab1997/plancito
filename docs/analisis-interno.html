@@ -1,0 +1,1350 @@
+<title>Turno Fijo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,600&display=swap">
+
+<style>
+  :root {
+    --ground:      #E9EDEA;
+    --surface:     #F7FAF8;
+    --surface-2:   #DFE5E1;
+    --ink:         #171C19;
+    --ink-2:       #3B4540;
+    --muted:       #6B766F;
+    --line:        #C9D2CC;
+    --line-soft:   #DCE3DE;
+
+    --accent:      #8E2434;
+    --accent-ink:  #FFFFFF;
+    --accent-soft: #F2DEE1;
+
+    --ok:          #26624A;
+    --ok-bg:       #DBE9E1;
+    --warn:        #8A5E0F;
+    --warn-bg:     #EFE4CC;
+    --dead:        #6B766F;
+    --dead-bg:     #DDE2DE;
+
+    --display: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
+    --body:    "Newsreader", Georgia, "Times New Roman", serif;
+    --mono:    "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+    --measure: 66ch;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:      #121714;
+      --surface:     #1A211D;
+      --surface-2:   #232B27;
+      --ink:         #E3E9E5;
+      --ink-2:       #BCC6C0;
+      --muted:       #8B9791;
+      --line:        #2E3833;
+      --line-soft:   #242D28;
+
+      --accent:      #D97A87;
+      --accent-ink:  #1A0E11;
+      --accent-soft: #372024;
+
+      --ok:          #79C3A0;
+      --ok-bg:       #1C2E27;
+      --warn:        #D0A64F;
+      --warn-bg:     #2E2818;
+      --dead:        #8B9791;
+      --dead-bg:     #232B27;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:      #121714;
+    --surface:     #1A211D;
+    --surface-2:   #232B27;
+    --ink:         #E3E9E5;
+    --ink-2:       #BCC6C0;
+    --muted:       #8B9791;
+    --line:        #2E3833;
+    --line-soft:   #242D28;
+
+    --accent:      #D97A87;
+    --accent-ink:  #1A0E11;
+    --accent-soft: #372024;
+
+    --ok:          #79C3A0;
+    --ok-bg:       #1C2E27;
+    --warn:        #D0A64F;
+    --warn-bg:     #2E2818;
+    --dead:        #8B9791;
+    --dead-bg:     #232B27;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .shell {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px 96px;
+  }
+
+  /* ---------- masthead ---------- */
+
+  .masthead { padding: 72px 0 0; }
+
+  .kicker {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 18px;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(2.9rem, 8vw, 4.6rem);
+    line-height: .95;
+    letter-spacing: -.035em;
+    margin: 0;
+    text-wrap: balance;
+    color: var(--ink);
+  }
+
+  .standfirst {
+    max-width: var(--measure);
+    font-size: 1.16rem;
+    line-height: 1.55;
+    color: var(--ink-2);
+    margin: 22px 0 0;
+  }
+
+  .pole {
+    height: 9px;
+    margin: 34px 0 0;
+    border-radius: 1px;
+    background-image: repeating-linear-gradient(
+      -58deg,
+      var(--accent) 0 9px,
+      transparent 9px 22px
+    );
+    opacity: .85;
+  }
+
+  .stamp {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 26px;
+    margin: 18px 0 0;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .stamp b { color: var(--ink-2); font-weight: 500; }
+
+  /* ---------- frame ---------- */
+
+  .frame {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    margin-top: 64px;
+  }
+
+  @media (min-width: 1040px) {
+    .frame {
+      grid-template-columns: 200px minmax(0, 1fr);
+      gap: 56px;
+      align-items: start;
+    }
+    .index { position: sticky; top: 32px; display: block; }
+  }
+
+  .index { display: none; }
+
+  .index ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-left: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .index a {
+    display: block;
+    padding: 7px 0 7px 14px;
+    margin-left: -1px;
+    border-left: 2px solid transparent;
+    font-family: var(--display);
+    font-size: 13px;
+    line-height: 1.35;
+    letter-spacing: -.005em;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color .15s ease, border-color .15s ease;
+  }
+  .index a:hover,
+  .index a:focus-visible { color: var(--accent); border-left-color: var(--accent); }
+
+  main { min-width: 0; display: flex; flex-direction: column; gap: 68px; }
+
+  /* ---------- sections ---------- */
+
+  section { scroll-margin-top: 24px; }
+
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 12px 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 26px;
+  }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 1.62rem;
+    letter-spacing: -.02em;
+    line-height: 1.1;
+    margin: 0;
+    color: var(--ink);
+  }
+
+  h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 1.03rem;
+    letter-spacing: -.005em;
+    margin: 0 0 10px;
+    color: var(--ink);
+  }
+
+  p { margin: 0 0 14px; max-width: var(--measure); }
+  p:last-child { margin-bottom: 0; }
+
+  .prose > * + h3 { margin-top: 30px; }
+
+  strong { font-weight: 600; color: var(--ink); }
+
+  em.term {
+    font-style: normal;
+    font-family: var(--mono);
+    font-size: .87em;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  /* ---------- chips ---------- */
+
+  .chip {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+  .chip.ok   { background: var(--ok-bg);   color: var(--ok); }
+  .chip.warn { background: var(--warn-bg); color: var(--warn); }
+  .chip.dead { background: var(--dead-bg); color: var(--dead); }
+
+  /* ---------- verdict ---------- */
+
+  .verdict {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--accent);
+    border-radius: 4px;
+    padding: 26px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .verdict p { max-width: none; margin: 0; }
+  .verdict .lead {
+    font-family: var(--display);
+    font-size: 1.24rem;
+    font-weight: 500;
+    line-height: 1.32;
+    letter-spacing: -.015em;
+  }
+  .verdict .gate {
+    background: var(--warn-bg);
+    border-radius: 4px;
+    padding: 15px 17px;
+    font-size: .96rem;
+    color: var(--ink-2);
+  }
+  .verdict .gate .chip { margin-right: 9px; vertical-align: 2px; }
+  .verdict .gate strong { color: var(--ink); }
+
+  .cond {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--warn);
+    background: var(--warn-bg);
+    padding: 2px 5px;
+    border-radius: 2px;
+    margin-left: 4px;
+    white-space: nowrap;
+  }
+
+  /* ---------- facts ---------- */
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .fact { background: var(--surface); padding: 16px 18px; display: flex; flex-direction: column; gap: 4px; }
+  .fact dt {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .fact dd {
+    margin: 0;
+    font-family: var(--display);
+    font-size: 1.3rem;
+    font-weight: 600;
+    letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+  .fact.derived { background: var(--warn-bg); }
+  .fact.derived dt { color: var(--warn); }
+  .fact dd small {
+    display: block;
+    font-family: var(--body);
+    font-size: .8rem;
+    font-weight: 400;
+    letter-spacing: 0;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* ---------- tables ---------- */
+
+  .scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 4px; background: var(--surface); }
+
+  table { border-collapse: collapse; width: 100%; font-size: .93rem; }
+
+  th, td {
+    text-align: left;
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: top;
+  }
+  thead th {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td.num, th.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.total { font-weight: 600; color: var(--ink); }
+  tr.sum td { background: var(--surface-2); font-weight: 600; }
+  td .neg { color: var(--accent); font-weight: 600; }
+  td .pos { color: var(--ok); font-weight: 600; }
+  th.lbl { width: 42%; }
+
+  /* ---------- math block ---------- */
+
+  .math {
+    font-family: var(--mono);
+    font-size: .84rem;
+    line-height: 1.85;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    white-space: pre;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+  .math b { color: var(--accent); font-weight: 600; }
+
+  /* ---------- lists ---------- */
+
+  ul.ticks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; max-width: var(--measure); }
+  ul.ticks li { position: relative; padding-left: 22px; }
+  ul.ticks li::before {
+    content: "";
+    position: absolute;
+    left: 4px; top: .68em;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  ul.ticks li.out::before { background: none; border: 1px solid var(--muted); }
+
+  /* ---------- split ---------- */
+
+  .split { display: grid; gap: 20px; grid-template-columns: 1fr; }
+  @media (min-width: 720px) { .split { grid-template-columns: 1fr 1fr; } }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 20px 22px;
+  }
+  .panel h3 { display: flex; align-items: center; gap: 9px; margin-bottom: 14px; }
+
+  /* ---------- rules / q&a ---------- */
+
+  .rules { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--line); border-radius: 4px; background: var(--surface); }
+  .rule { padding: 16px 20px; border-bottom: 1px solid var(--line-soft); display: flex; flex-direction: column; gap: 5px; }
+  .rule:last-child { border-bottom: none; }
+  .rule .k {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: .96rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .rule .v { color: var(--ink-2); font-size: .96rem; max-width: var(--measure); }
+  .rule .v b { color: var(--ink); }
+
+  .q { counter-reset: none; }
+  .q .rule .k { color: var(--ink); }
+  .q .why { font-size: .88rem; color: var(--muted); }
+
+  /* ---------- footer ---------- */
+
+  footer {
+    margin-top: 76px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .05em;
+    color: var(--muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 22px;
+  }
+
+  code {
+    font-family: var(--mono);
+    font-size: .86em;
+    background: var(--surface-2);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  a { color: var(--accent); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+
+<div class="shell">
+
+  <header class="masthead">
+    <p class="kicker">Análisis de viabilidad · Barbería</p>
+    <h1>Turno&nbsp;Fijo</h1>
+    <p class="standfirst">
+      <strong>Productizar el servicio de barbería:</strong> convertir cortes sueltos en un producto
+      con nombre, precio y condiciones. Después de bajar los números, lo que se vende no es un corte
+      de regalo — es el horario garantizado. Este documento cierra dónde quedó la idea, qué está
+      decidido y qué falta.
+    </p>
+    <div class="pole" aria-hidden="true"></div>
+    <div class="stamp">
+      <span>Estado: <b>viable con condiciones</b></span>
+      <span>Mercado: <b>Argentina · barbería single-chair</b></span>
+      <span>Modelo: <b>SaaS 50.000/mes por barbería</b></span>
+    </div>
+  </header>
+
+  <div class="frame">
+
+    <nav class="index" aria-label="Índice">
+      <ol>
+        <li><a href="#veredicto">Veredicto</a></li>
+        <li><a href="#datos">Datos del negocio</a></li>
+        <li><a href="#economia">La economía</a></li>
+        <li><a href="#producto">Qué se vende</a></li>
+        <li><a href="#casos">Casos de valor</a></li>
+        <li><a href="#ciclos">Ciclos y créditos</a></li>
+        <li><a href="#reglas">Reglas decididas</a></li>
+        <li><a href="#scope">Scope v1</a></li>
+        <li><a href="#replicable">Otras barberías</a></li>
+        <li><a href="#pendiente">Decisiones abiertas</a></li>
+        <li><a href="#preguntas">Preguntas al barbero</a></li>
+        <li><a href="#riesgos">Riesgos</a></li>
+        <li><a href="#next">Próximo paso</a></li>
+      </ol>
+    </nav>
+
+    <main>
+
+      <!-- VEREDICTO -->
+      <section id="veredicto">
+        <div class="head">
+          <h2>Veredicto</h2>
+          <span class="chip ok">Viable con condiciones</span>
+        </div>
+        <div class="verdict">
+          <p class="lead">
+            El plan funciona, pero no por la razón original. La barbería está al 100% de ocupación:
+            regalar un corte en horario normal le cuesta plata al barbero. Regalarlo en horario valle
+            (13–15hs, capacidad que hoy no existe) no le cuesta nada.
+          </p>
+          <p>
+            Y el valor real que se vende no es el corte gratis: es <strong>el turno garantizado</strong>.
+            Turnito es first-come-first-served, así que hoy un cliente fijo puede perder su viernes 19hs
+            porque otro lo reservó primero. Esa fricción confirmada es el producto.
+          </p>
+          <p>
+            El ingreso que justifica los 50.000 no sale de un premium sobre el plan: sale de que
+            <strong>una vez que el barbero abre a las 13hs por un canje, la hora de al lado se vende a
+            precio completo</strong> sobre capacidad que antes no existía.
+          </p>
+          <p class="gate">
+            <span class="chip warn">Supuesto sin confirmar</span>
+            Todo lo que sigue asume que <strong>el barbero acepta abrir 13–15hs</strong>. Él nunca lo dijo:
+            es una inferencia. Si dice que no, se caen el corte gratis, los créditos y la ventana de
+            ingreso nueva, y el producto se reduce a <strong>turno garantizado + reserva prioritaria +
+            lista de espera</strong>. Es la primera pregunta a hacerle.
+          </p>
+        </div>
+      </section>
+
+      <!-- DATOS -->
+      <section id="datos">
+        <div class="head">
+          <h2>Datos del negocio</h2>
+          <span class="chip ok">Confirmado</span>
+        </div>
+        <div class="prose">
+          <p>Todo lo que sigue se apoya en estos números, dados por el barbero.</p>
+        </div>
+        <dl class="facts" style="margin-top:18px">
+          <div class="fact"><dt>Jornada</dt><dd>15–22<small>martes a sábado</small></dd></div>
+          <div class="fact"><dt>Duración turno</dt><dd>1 h<small>igual para corte y corte+barba</small></dd></div>
+          <div class="fact"><dt>Capacidad prime</dt><dd>35<small>turnos / semana ≈ 151 / mes</small></dd></div>
+          <div class="fact"><dt>Ocupación</dt><dd>~100%<small>1–2 huecos sueltos por día</small></dd></div>
+          <div class="fact"><dt>Corte</dt><dd>15.000<small>corte + barba: 18.000</small></dd></div>
+          <div class="fact derived"><dt>Facturación · derivada</dt><dd>~2,3 M<small>151 × 15.000, asumiendo todo corte simple. Piso, no dato del barbero. Tu sub ≈ 2%.</small></dd></div>
+        </dl>
+
+        <div class="split" style="margin-top:22px">
+          <div class="panel">
+            <h3>App actual: Turnito</h3>
+            <p style="font-size:.95rem;color:var(--ink-2)">
+              Solo registra día y horario. Recordatorio por WhatsApp 2 horas antes.
+              Sin horarios reservados: el que entra primero se lleva el turno.
+            </p>
+          </div>
+          <div class="panel">
+            <h3>Política de no-show</h3>
+            <p style="font-size:.95rem;color:var(--ink-2)">
+              Menos de 5 cancelaciones tardías. Si reservás y no vas, pagás igual —
+              así que la pérdida por no-show ya está cubierta por política, no por software.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ECONOMIA -->
+      <section id="economia">
+        <div class="head">
+          <h2>La economía, en tres pasos</h2>
+        </div>
+
+        <div class="prose">
+          <h3>1 · El “4 + 1 gratis” original <span class="chip dead" style="margin-left:6px">Descartado</span></h3>
+          <p>
+            Los precios propuestos eran la suma exacta de los servicios sueltos:
+            4 × 15.000 = 60.000, y 4 × 18.000 = 72.000. O sea, el cliente que ya venía semanal
+            paga <strong>lo mismo</strong> y ocupa <strong>5 sillas en vez de 4</strong>.
+          </p>
+        </div>
+
+        <div class="scroll" style="margin:18px 0 0">
+          <table>
+            <thead>
+              <tr>
+                <th class="lbl">Cliente semanal, a ocupación llena</th>
+                <th class="num">Hoy</th>
+                <th class="num">Con plan 4+1</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Paga por mes</td><td class="num">60.000</td><td class="num">60.000</td></tr>
+              <tr><td>Slots prime que ocupa</td><td class="num">4</td><td class="num">5</td></tr>
+              <tr><td>El 5.º slot desplaza a un cliente que paga</td><td class="num">—</td><td class="num"><span class="neg">−15.000</span></td></tr>
+              <tr class="sum"><td class="total">Resultado para el barbero</td><td class="num">60.000</td><td class="num"><span class="neg">45.000</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="prose" style="margin-top:16px">
+          <p>
+            <strong>−15.000 por suscriptor por mes.</strong> Con 10 suscriptores: −150.000, más tu sub
+            de 50.000 = <strong>−200.000/mes</strong>. El barbero paga para perder plata.
+            Regalar cortes solo sirve si hay silla vacía, y no la hay.
+          </p>
+
+          <h3>2 · El horario valle <span class="chip ok" style="margin-left:6px">Lo arregla</span></h3>
+          <p>
+            Abrir 13–15hs de martes a sábado no desplaza nada: es <strong>capacidad nueva</strong>.
+          </p>
+        </div>
+
+        <div class="math" style="margin-top:14px">2 h/día × 5 días  =  <b>10 slots/semana</b>  ≈  <b>43 slots/mes</b>
+horario valle 13–15hs · antes no existían</div>
+
+        <div class="prose" style="margin-top:16px">
+          <p>
+            Con el canje en valle, la cuenta se da vuelta: el barbero cobra lo mismo (60.000),
+            ocupa los mismos 4 slots prime, y el 5.º sale de capacidad nueva. El costo deja de ser
+            capacidad y pasa a ser <strong>mano de obra: 1 hora extra por suscriptor por mes</strong>.
+          </p>
+
+          <h3>3 · El agrupamiento <span class="chip ok" style="margin-left:6px">Es el negocio</span></h3>
+          <p>
+            Acá está la plata. Una vez que el barbero vino a las 13hs por un canje,
+            <strong>la hora de al lado no le cuesta nada</strong> — ya está abierto, ya está ahí.
+            Vender ese segundo slot a precio completo es ingreso nuevo con cero mano de obra marginal.
+          </p>
+        </div>
+
+        <div class="scroll" style="margin:18px 0 0">
+          <table>
+            <thead>
+              <tr>
+                <th class="lbl">Un día de valle abierto por 1 canje</th>
+                <th class="num">Ingreso</th>
+                <th class="num">Hora extra</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>13hs — canje de plan</td><td class="num">0</td><td class="num">1</td></tr>
+              <tr><td>14hs — vendido a precio completo</td><td class="num"><span class="pos">15.000</span></td><td class="num">1</td></tr>
+              <tr class="sum"><td class="total">Neto del viaje</td><td class="num"><span class="pos">15.000</span></td><td class="num">2</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="prose" style="margin-top:16px">
+          <p>
+            Por eso el agrupamiento no es un detalle de pulido: el sistema tiene que
+            <strong>empaquetar los canjes en los mismos días y horas contiguas</strong>,
+            no dispersar uno por día en cinco días. Un viaje del barbero cubre 2–3 cortes,
+            y el hueco valle libre al lado se ofrece a la lista de espera.
+          </p>
+          <p>
+            Eso cambia la respuesta a <em class="term">¿qué gana el barbero por 50.000?</em>:
+            de “un descuento que él paga” a “una ventana de ingreso que antes no tenía”.
+          </p>
+        </div>
+      </section>
+
+      <!-- PRODUCTO -->
+      <section id="producto">
+        <div class="head">
+          <h2>Qué se vende, realmente</h2>
+        </div>
+        <div class="prose">
+          <p>
+            El plan se vende <strong>sin descuento</strong>, al mismo precio que el cliente ya paga hoy.
+            Lo que cambia es lo que recibe.
+          </p>
+          <p>
+            <strong>Base y opcional no se mezclan nunca.</strong> El beneficio base — horario reservado,
+            reserva anticipada, no agendar cada semana — <em>es</em> el producto y va siempre.
+            El corte extra es un agregado que depende de una decisión del barbero y puede no existir.
+            Vender “te regalo un corte” antes de que esa decisión esté tomada es quedar mal con el cliente.
+          </p>
+        </div>
+
+        <div class="split" style="margin-top:20px">
+          <div class="panel">
+            <h3>Al cliente</h3>
+            <ul class="ticks">
+              <li><strong>Prioridad sobre tu horario</strong> cada semana. El jueves 19hs se te retiene; nadie te lo saca por entrar primero.</li>
+              <li><strong>No reservás cada semana.</strong> El turno se sostiene solo, vos solo confirmás.</li>
+              <li><strong>Ventana de reserva prioritaria</strong> para el resto de los turnos.</li>
+              <li>Mismo precio que hoy.</li>
+              <li><strong>1 corte extra por ciclo</strong> en horario valle. <span class="cond">opcional</span></li>
+            </ul>
+          </div>
+          <div class="panel">
+            <h3>Al barbero</h3>
+            <ul class="ticks">
+              <li><strong>Cobro por adelantado</strong> e ingreso predecible.</li>
+              <li><strong>Se queda con la semana no usada</strong> — y encima revende el slot liberado.</li>
+              <li><strong>Ventana de ingreso nueva</strong> en el valle, vía agrupamiento.</li>
+              <li><strong>Mix hacia arriba:</strong> corte+barba ocupa la misma hora y deja 3.000 más.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="prose" style="margin-top:26px">
+          <h3>El turno fijo y el crédito semanal se pelean</h3>
+          <p>
+            Si el jueves 19hs <strong>se auto-reserva</strong> cada semana, el crédito se consume solo
+            siempre y el breakage es cero: la regla de vencimiento semanal no dispara nunca.
+            Las dos features estrella se cancelan.
+          </p>
+        </div>
+
+        <div class="math" style="margin-top:14px">slot <b>RETENIDO</b> (no reservado) → suscriptor confirma hasta X hs antes
+   confirma      → turno tomado
+   no confirma   → crédito vence <b>y</b> el slot se libera a la venta</div>
+
+        <div class="prose" style="margin-top:16px">
+          <p>
+            Con esa regla el barbero cobra dos veces por la misma hora: al suscriptor que no vino,
+            y a quien compre el slot liberado. Pero baja lo que se puede prometer, y esto es lo que
+            va literal en la página de venta:
+          </p>
+          <p style="font-size:1.02rem">
+            <span style="color:var(--muted);text-decoration:line-through">tu jueves 19hs es tuyo</span><br>
+            <strong>tenés prioridad sobre tu jueves 19hs cada semana</strong>
+          </p>
+
+          <h3>Advertencia honesta</h3>
+          <p>
+            13–15hs de martes a sábado es horario laboral para la mayoría.
+            <strong>La tasa de canje puede ser casi nula.</strong> Si pasa eso, el corte gratis es
+            marketing y el plan en realidad es “mismo precio, prioridad de horario” — que igual se vende,
+            porque la competencia por los turnos está confirmada. Pero el pitch no puede apoyarse
+            en un perk que quizás nadie use.
+          </p>
+
+          <h3>El margen aparece solo cuando el cliente falta</h3>
+          <p>
+            Con vencimiento semanal y canje en valle, por cada suscriptor de 60.000:
+          </p>
+        </div>
+
+        <div class="scroll" style="margin:18px 0 0">
+          <table>
+            <thead>
+              <tr>
+                <th class="lbl">Comportamiento del suscriptor</th>
+                <th class="num">Prime</th>
+                <th class="num">Valle</th>
+                <th>Vs. hoy</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Va las 4 semanas + canjea el extra</td><td class="num">4</td><td class="num">1</td><td>Plata igual, <span class="neg">+1 h de trabajo</span></td></tr>
+              <tr><td>Va las 4, no canjea el extra</td><td class="num">4</td><td class="num">0</td><td>Plata igual, horas iguales</td></tr>
+              <tr><td>Falta 1 semana + canjea el extra</td><td class="num">3</td><td class="num">1</td><td><span class="pos">+15.000</span>, +1 h de trabajo</td></tr>
+              <tr class="sum"><td class="total">Falta 1 semana, no canjea</td><td class="num">3</td><td class="num">0</td><td><span class="pos">+15.000</span>, −1 h de trabajo</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="prose" style="margin-top:16px">
+          <p>
+            El barbero nunca pierde plata: en el peor caso trabaja una hora extra por cero cash.
+            Pero <strong>solo gana cuando el cliente falta</strong>.
+          </p>
+          <p>
+            Ahí está el problema del segmento elegido. <strong>Para el semanal confiable esto es neutro,
+            no rentable</strong> — la mecánica de gimnasio es inerte justo con los que nunca fallan.
+            Donde paga es el <strong>semanal aspiracional</strong>: quiere ir todas las semanas, llega a
+            3 de 4. Compra por compromiso y falla lo suficiente para generar margen.
+          </p>
+        </div>
+      </section>
+
+      <!-- CASOS -->
+      <section id="casos">
+        <div class="head">
+          <h2>Casos de valor</h2>
+          <span class="chip warn">Para elegir</span>
+        </div>
+
+        <div class="prose">
+          <p>
+            Filtro previo: a 100% de ocupación, <strong>cualquier beneficio que “llene un turno” o
+            “retenga un cliente” vale cero</strong> — el turno se rellena solo. Solo cuatro categorías
+            mueven plata: más ingreso por turno, turnos nuevos, menos trabajo no pagado del barbero,
+            y plata por turnos que no se trabajan.
+          </p>
+        </div>
+
+        <h3 style="margin:28px 0 12px">Por qué el barbero paga 50.000</h3>
+        <div class="scroll">
+          <table>
+            <thead>
+              <tr><th class="lbl">Caso</th><th>Categoría</th><th class="num">Estimado / mes</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Upsell de mix al reservar</strong><br><span style="color:var(--muted)">Sugerir corte+barba al agendar. Misma hora, +3.000.</span></td>
+                <td>Ingreso por turno</td>
+                <td class="num"><span class="pos">30.000–60.000</span></td>
+              </tr>
+              <tr>
+                <td><strong>Repricing por inflación</strong><br><span style="color:var(--muted)">Sube el precio a todos de una, con aviso automático y respetando el ciclo en curso. Hoy es una conversación incómoda cliente por cliente.</span></td>
+                <td>Ingreso por turno</td>
+                <td class="num">alto, difícil de estimar</td>
+              </tr>
+              <tr>
+                <td><strong>Conversión en la silla</strong><br><span style="color:var(--muted)">Ofrecer el plan mientras lo corta; ese corte es el crédito 1. Cada turno es un punto de venta.</span></td>
+                <td>Adquisición</td>
+                <td class="num">es el motor de altas</td>
+              </tr>
+              <tr>
+                <td><strong>Prepago + breakage semanal</strong></td>
+                <td>Turnos no trabajados</td>
+                <td class="num">según tasa de fallo</td>
+              </tr>
+              <tr>
+                <td><strong>Menos admin</strong><br><span style="color:var(--muted)">Deja de coordinar por WhatsApp.</span></td>
+                <td>Trabajo no pagado</td>
+                <td class="num">preguntar horas/día</td>
+              </tr>
+              <tr>
+                <td><strong>Valle agrupado</strong> <span class="cond">si hay valle</span></td>
+                <td>Turnos nuevos</td>
+                <td class="num">60.000 si vende 1/semana</td>
+              </tr>
+              <tr>
+                <td><strong>Lista de espera</strong><br><span style="color:var(--muted)">Solo vale por la porción de cancelaciones donde <em>no</em> cobra la penalidad.</span></td>
+                <td>Turnos no trabajados</td>
+                <td class="num">bajo — no inflar</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="prose" style="margin-top:16px">
+          <p>
+            <strong>El upsell de mix es la mejor línea del pitch.</strong> No depende del valle,
+            no necesita integración de pagos, no se apoya en el hueco de la política de no-show.
+            Con 10–20 conversiones al mes ya paga los 50.000 sola.
+          </p>
+          <h3>Descartados por ocupación llena</h3>
+          <p>Decilos vos antes de que los note él — presentarlos como beneficio quema credibilidad.</p>
+          <ul class="ticks">
+            <li class="out"><strong>Alertas de churn</strong> — el turno del que se va se rellena solo.</li>
+            <li class="out"><strong>Llenar huecos de último momento</strong> — casi no hay huecos.</li>
+            <li class="out"><strong>Reviews, marketing, captación</strong> — no necesita más demanda.</li>
+          </ul>
+        </div>
+
+        <h3 style="margin:34px 0 12px">Por qué el cliente paga el plan</h3>
+        <div class="scroll">
+          <table>
+            <thead>
+              <tr><th class="lbl">Caso</th><th>Costo real para el barbero</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Prioridad sobre su horario</strong>, semana a semana</td><td>0</td></tr>
+              <tr><td><strong>No reservar cada semana</strong> — el turno se sostiene, solo confirma</td><td>0</td></tr>
+              <tr><td><strong>Ventana de reserva anticipada</strong></td><td>0</td></tr>
+              <tr><td><strong>Corte extra en valle</strong></td><td>1 hora de trabajo</td></tr>
+              <tr><td><strong>Precio congelado 1 ciclo</strong> cuando sube la lista</td><td>2–3% real</td></tr>
+              <tr><td><strong>Corte de invitado</strong> (hijo, amigo) — canal de adquisición</td><td>1 hora de valle</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="split" style="margin-top:20px">
+          <div class="panel">
+            <h3>Cuidado con el precio congelado</h3>
+            <p style="font-size:.94rem;color:var(--ink-2);margin:0">
+              En ARS es un descuento real compuesto: a ~2–3% mensual, congelar tres meses cuesta
+              6–9% real sobre tus mejores clientes. Y pelea de frente con el feature que le vendés
+              al barbero — “subí el precio a todos de una” contra “tus mejores clientes están exentos”.
+              <strong>Un ciclo, no más.</strong>
+            </p>
+          </div>
+          <div class="panel">
+            <h3>Cuidado con el corte de invitado</h3>
+            <p style="font-size:.94rem;color:var(--ink-2);margin:0">
+              Buen canal de adquisición, pero a ocupación llena consume un slot prime — el mismo
+              problema que hundió al corte gratis original. <strong>Solo valle</strong>, o hereda
+              la dependencia sin confirmar.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- CICLOS -->
+      <section id="ciclos">
+        <div class="head">
+          <h2>Ciclos y créditos</h2>
+          <span class="chip ok">Cerrado</span>
+        </div>
+
+        <div class="prose">
+          <p>
+            El barbero atiende martes a sábado, así que la semana operativa es
+            <em class="term">martes → sábado</em>. Los ciclos se anclan a ese calendario, no a la
+            fecha de pago: <strong>quien paga durante la semana arranca el martes siguiente</strong>.
+          </p>
+        </div>
+
+        <div class="math" style="margin-top:16px">Cliente paga sábado 6/sep
+
+  sáb 6       →  no cuenta
+  <b>mar 9</b>       →  ARRANCA ciclo 1 · semana 1   [crédito 1] [+ extra del ciclo]
+  mar 16      →  semana 2                    [crédito 2]
+  mar 23      →  semana 3                    [crédito 3]
+  mar 30      →  semana 4                    [crédito 4]
+  sáb 4/oct   →  fin de ciclo · vence el extra
+  <b>mar 7/oct</b>   →  ciclo 2 · cobrar</div>
+
+        <div class="prose" style="margin-top:16px">
+          <p>
+            28 días exactos, y <strong>todos los ciclos empiezan un martes y terminan un sábado</strong>.
+            En el modelo general el ancla no es “martes”: es el <em class="term">primer día de atención
+            de la semana</em> de cada barbería, y el vencimiento es su último día.
+            Eso regala una simplificación grande: un solo job los martes a las 00:00 otorga los créditos
+            de la semana a todo el mundo. El crédito vence el <strong>sábado al cierre, 22hs</strong>.
+          </p>
+
+          <h3>Excepción: arranque manual</h3>
+          <p>
+            El barbero puede adelantar el arranque a pedido del cliente. Para que no se rompa el ancla,
+            <strong>el override acorta la primera semana pero no mueve el calendario</strong>:
+            solo el primer ciclo puede ser corto, del segundo en adelante son siempre 28 días desde un martes.
+          </p>
+        </div>
+
+        <div class="math" style="margin-top:16px">Activa miércoles 10/sep con override
+
+  sem 1 <b>corta</b>   mié 10 → sáb 13     [crédito 1]
+  sem 2         mar 16 → sáb 20     [crédito 2]
+  sem 3         mar 23 → sáb 27     [crédito 3]
+  sem 4         mar 30 → sáb 4/oct  [crédito 4]
+  ciclo 2       <b>mar 7/oct</b>          → cobrar
+
+ciclo 1 = 25 días · ciclo 2 en adelante = 28</div>
+
+        <div class="prose" style="margin-top:16px">
+          <p>
+            La semana corta <strong>no le cuesta nada al cliente si usa el crédito</strong>.
+            Alguien que paga un sábado, activa con override y se corta ese mismo día:
+          </p>
+        </div>
+
+        <div class="math" style="margin-top:14px">sem 1   sáb 6              [crédito 1 → <b>USED</b> ese día]
+sem 2   mar 9  → sáb 13    corte sáb 13
+sem 3   mar 16 → sáb 20    corte sáb 20
+sem 4   mar 23 → sáb 27    corte sáb 27
+ciclo 2 mar 30
+
+cortes: 6 · 13 · 20 · 27  →  <b>cadencia semanal exacta</b></div>
+
+        <div class="prose" style="margin-top:16px">
+          <p>
+            Tampoco es un negocio oculto para el barbero: un primer ciclo de 22 días en vez de 28 corre
+            la renovación seis días, una sola vez. En un año son ~13,25 ciclos contra 13,04 — y esos
+            0,2 ciclos de más el cliente los recibe en cortes. Empate, no asimetría.
+          </p>
+          <p>
+            <strong>El único caso malo es uno:</strong> activar con override y <em>no</em> cortarse antes
+            del sábado. Ahí el crédito 1 vence esa misma noche — 15.000 perdidos limpios.
+            Así que la regla no es bloquear días, es atar el override a una reserva.
+          </p>
+        </div>
+
+        <div class="math" style="margin-top:14px">override "arranca hoy"
+   └── exige turno agendado en los días que quedan de la semana
+       └── si no hay turno → advertencia (no bloquea)</div>
+
+        <div class="prose" style="margin-top:16px">
+          <p>
+            La decisión es del cliente y cabe en una pregunta. Dos botones al activar:
+          </p>
+          <p style="font-size:1.02rem">
+            <strong>¿Te cortás antes del sábado?</strong><br>
+            Sí → arranca hoy&nbsp; · &nbsp;No → arranca el martes
+          </p>
+          <p>
+            Un jueves sin necesidad de corte hasta el martes: botón “no”. Un sábado con la necesidad
+            encima: botón “sí”, y el corte de hoy es el crédito 1.
+          </p>
+
+          <h3>El override no es un caso borde: es el flujo de venta</h3>
+          <p>
+            Nadie paga una suscripción y después espera tres días. La compra pasa
+            <strong>cuando el cliente ya está en la silla</strong> — el barbero le ofrece el plan
+            mientras lo corta, y ese corte cuenta como crédito 1. Un solo tap:
+            <em class="term">Activar plan + usar el crédito de hoy</em>.
+          </p>
+          <p>
+            Eso convierte cada corte en un punto de venta sin que el barbero tenga que hacer campaña.
+            Es la mejor mecánica de conversión del producto.
+          </p>
+          <p>
+            Preview y log siguen, con otro propósito: no para protegerse del barbero, sino para dejar
+            registro de lo que el cliente eligió y para que vea sus fechas de ciclo en su cuenta.
+          </p>
+          <ul class="ticks">
+            <li><strong>Preview antes de confirmar:</strong> <em class="term">Arranca hoy sáb 6/sep · semana 1 vence hoy 22hs · renueva mar 30/sep</em></li>
+            <li><strong>Log de cambios de fecha:</strong> quién, cuándo, de qué a qué.</li>
+          </ul>
+        </div>
+
+        <h3 style="margin:32px 0 12px">Bordes del ciclo</h3>
+        <div class="rules">
+          <div class="rule">
+            <div class="k">Gap entre pago y arranque</div>
+            <div class="v">Hasta 6 días pagados sin poder reservar. La app muestra <b>“tu plan arranca el martes 9”</b> al activar, y el barbero debería cobrar cerca del arranque. Si no, se siente estafa.</div>
+          </div>
+          <div class="rule">
+            <div class="k">El barbero cierra una semana entera</div>
+            <div class="v"><b>El reloj del ciclo se pausa.</b> La semana bloqueada no consume crédito ni avanza el ciclo. Sin esta regla, los reclamos de reembolso son seguros.</div>
+          </div>
+          <div class="rule">
+            <div class="k">Feriado suelto</div>
+            <div class="v">La semana sigue existiendo (mié–sáb). El ciclo <b>solo</b> se pausa si cierra la semana completa.</div>
+          </div>
+          <div class="rule">
+            <div class="k">Drift de la fecha de cobro <span class="chip ok">Resuelto</span></div>
+            <div class="v">Con ciclos de 28 días la fecha corre por el mes: enero 7, febrero 4, marzo 3. Con cobro en efectivo cara a cara eso molesta — el cliente espera pagar “a principio de mes”.<br><b>Lista de “cobrar hoy” cada martes</b> para el barbero: abre la app, ve quién renueva, cobra. Convierte el drift en rutina.</div>
+          </div>
+          <div class="rule">
+            <div class="k">No paga la renovación <span class="chip warn">Decidir</span></div>
+            <div class="v">¿Pierde el slot retenido de una, o hay una semana de gracia con prioridad pero sin crédito?</div>
+          </div>
+        </div>
+
+        <h3 style="margin:32px 0 12px">Máquina de estados del crédito semanal</h3>
+        <div class="math">GRANTED  (martes 00:00)
+   │
+   ├── agenda turno ──────────► RESERVED
+   │                              ├── asiste ───────────────► <b>USED</b>
+   │                              ├── cancela > X hs ───────► GRANTED  (misma semana)
+   │                              └── cancela &lt; X hs
+   │                                  o no asiste ──────────► <b>BURNED</b>  + slot liberado
+   │
+   └── no agenda hasta
+       sábado 22hs ───────────► <b>EXPIRED</b> + slot liberado</div>
+
+        <div class="prose" style="margin-top:16px">
+          <p>
+            <em class="term">BURNED</em> y <em class="term">EXPIRED</em> son el margen del plan;
+            <em class="term">USED</em> es neutro. Vale la pena guardarlos separados: dicen si el cliente
+            falla por olvido — mandale recordatorio — o por imprevisto, que es el que deja plata.
+          </p>
+        </div>
+      </section>
+
+      <!-- REGLAS -->
+      <section id="reglas">
+        <div class="head">
+          <h2>Reglas decididas</h2>
+          <span class="chip ok">Cerrado</span>
+        </div>
+        <div class="rules">
+          <div class="rule">
+            <div class="k">Crédito semanal, vence semanal</div>
+            <div class="v">1 corte por semana. <b>Si el suscriptor no agenda esa semana, el crédito se pierde</b> — no se acumula ni pasa a la siguiente. Ese vencimiento <b>es</b> el motor de margen del plan, y el corte extra es lo que compensa al cliente por aceptarlo. Ciclo de <b>28 días anclado a martes</b>: 13 ciclos al año en vez de 12, 780.000 contra 720.000 anuales por suscriptor. Detalle completo en <a href="#ciclos">Ciclos y créditos</a>.</div>
+          </div>
+          <div class="rule">
+            <div class="k">Crédito extra</div>
+            <div class="v">Vence <b>por ciclo, no por semana</b> — si siguiera la regla semanal, “1 extra al mes” se contradiría solo. Canjeable <b>solo en valle</b>. Sin rollover, escrito y visible para el suscriptor: es lo que después genera las disputas.</div>
+          </div>
+          <div class="rule">
+            <div class="k">Slot valle</div>
+            <div class="v">13–15hs, <b>reservable solo con canje de crédito</b>. Aviso mínimo: reservar hasta la noche anterior, para que el barbero sepa si le conviene venir. Los canjes se agrupan en días y horas contiguas.</div>
+          </div>
+          <div class="rule">
+            <div class="k">Release del slot recurrente</div>
+            <div class="v">El slot está <b>retenido, no reservado</b>. El suscriptor confirma hasta X horas antes; si no confirma, <b>el crédito de esa semana vence y el slot se libera</b> a la lista de espera. Doble cobro por la misma hora: al que no vino y al que la compra.<br>Sin esta regla pasan dos cosas malas: un jueves 19hs bloqueado permanentemente es más difícil de rellenar que uno normal porque nunca salió al mercado, y la auto-reserva consumiría el crédito sola — anulando el vencimiento semanal que da el margen.</div>
+          </div>
+          <div class="rule">
+            <div class="k">Pagos</div>
+            <div class="v"><b>Fuera del sistema.</b> El barbero cobra el mensual por su cuenta y activa el plan buscando el username del cliente (modelo Discord/GitHub). Evita territorio de payment facilitator: split de pagos, AML, impuestos.</div>
+          </div>
+          <div class="rule">
+            <div class="k">Alta de suscriptor</div>
+            <div class="v">El usuario <b>se registra solo</b> (username + password) → le pasa su username al barbero → el barbero lo busca y le activa el plan. Mejor que una whitelist previa: la cuenta ya existe al activarse, no hay nada que reconciliar.</div>
+          </div>
+          <div class="rule">
+            <div class="k">Cliente sin plan</div>
+            <div class="v">Formulario sin cuenta: servicio, nombre, apellido, teléfono. <b>Necesita anti-abuso</b> — una URL pública sin verificación deja que cualquiera llene la semana con turnos falsos. Elegir uno: rate-limit por teléfono, tope de reservas sin confirmar por día, o turnos “pendientes” hasta que el barbero confirme.</div>
+          </div>
+          <div class="rule">
+            <div class="k">Concurrencia</div>
+            <div class="v">Constraint único sobre <b><code>(barber_id, fecha, hora)</code> en la base de datos</b>, no chequeo-y-después-insert en código. Dos personas tocando el mismo 15:00 es el bug más probable del sistema, y el flujo anónimo lo hace más probable porque no hay sesión que serialice nada.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCOPE -->
+      <section id="scope">
+        <div class="head">
+          <h2>Scope v1</h2>
+        </div>
+        <div class="split">
+          <div class="panel">
+            <h3>Dentro</h3>
+            <ul class="ticks">
+              <li>Cuentas de suscriptor</li>
+              <li>Barbero activa / desactiva planes por username</li>
+              <li>Ledger de créditos semanales, con ciclo de 28 días anclado a martes</li>
+              <li>Arranque manual adelantado, con preview y log de cambios</li>
+              <li><strong>“Activar plan + usar el crédito de hoy”</strong> en un tap, desde la silla</li>
+              <li>Pausa del ciclo cuando el barbero cierra una semana entera</li>
+              <li>Lista de “cobrar hoy” para el barbero, cada martes</li>
+              <li>Tipos de slot: <em class="term">PRIME</em> 15–22 · <em class="term">VALLEY</em> 13–15 <span class="cond">si hay valle</span></li>
+              <li>Valle canjeable solo con crédito, con agrupamiento y aviso mínimo <span class="cond">si hay valle</span></li>
+              <li>Slot recurrente retenido + release si no confirma</li>
+              <li><strong>Upsell de mix al reservar</strong> (corte → corte+barba)</li>
+              <li>Tope de slots reservados, configurable</li>
+              <li>Lista de espera con auto-relleno</li>
+              <li>Horarios y bloqueos configurables por el barbero</li>
+              <li><strong>Nada hardcodeado:</strong> días y horas, duración del turno, servicios, precios, planes, ventana de valle, topes</li>
+              <li>Barbero ve, edita y cancela turnos</li>
+              <li>Formulario anónimo con anti-abuso</li>
+            </ul>
+          </div>
+          <div class="panel">
+            <h3>Fuera</h3>
+            <ul class="ticks">
+              <li class="out">Pagos dentro de la app</li>
+              <li class="out">Onboarding self-service de barberías, facturación del SaaS, branding por local</li>
+              <li class="out">Reviews</li>
+              <li class="out">Venta de productos</li>
+              <li class="out">Autogestión de alta de plan por el cliente</li>
+            </ul>
+            <h3 style="margin-top:26px">Lista de espera: por qué entra</h3>
+            <p style="font-size:.93rem;color:var(--ink-2);margin:0">
+              Su valor no es recuperar plata de no-shows — la política del barbero ya la cubre.
+              Es <strong>llenar la hora valle al lado de un canje</strong> y rellenar cancelaciones
+              tardías sin tener que ejecutar la penalidad, que es socialmente incómoda y
+              probablemente se aplica a medias.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- REPLICABLE -->
+      <section id="replicable">
+        <div class="head">
+          <h2>Replicable a otras barberías</h2>
+          <span class="chip ok">Decidido</span>
+        </div>
+
+        <div class="prose">
+          <p>
+            El objetivo no es una app para este barbero: es un producto que sirva para cualquier
+            barbería. Eso no cambia el alcance de v1, cambia <strong>cómo se escribe</strong>.
+          </p>
+
+          <h3>v1: un solo local desplegado, esquema listo para varios</h3>
+          <p>
+            Se construye y se opera para una sola barbería — es lo que hace que el piloto entre en
+            semanas. Pero <code>barber_id</code> está en todas las tablas desde el primer día, y sumar
+            una segunda barbería no pide cambios de código. Retrofitear multi-tenancy después es caro;
+            ponerlo ahora no cuesta casi nada.
+          </p>
+
+          <h3>Lo que de verdad sería caro retrofitear</h3>
+          <p>
+            No es el <code>barber_id</code>: son las <strong>reglas de negocio clavadas en el código</strong>.
+            Todo esto tiene que nacer configurable:
+          </p>
+          <ul class="ticks">
+            <li><strong>Duración del turno.</strong> Acá es 1 hora para todo. Otras barberías trabajan a 30 o 45 minutos, y con duración distinta por servicio.</li>
+            <li><strong>Días y horario de atención</strong>, y con eso el <strong>ancla de semana</strong>: es el primer día de atención de esa barbería, no “martes”.</li>
+            <li><strong>Servicios y precios</strong>, y qué servicios entran en cada plan.</li>
+            <li><strong>Ventana de valle</strong> — si existe, y cuál es.</li>
+            <li><strong>Tope de slots reservables</strong>, y qué horarios quedan excluidos.</li>
+            <li><strong>Largo del ciclo</strong> y ventana de cancelación.</li>
+          </ul>
+
+          <h3>El análisis de acá no se traslada tal cual</h3>
+          <p>
+            Todo lo de este documento está calibrado a <strong>100% de ocupación</strong>. Para una
+            barbería con sillas vacías la economía se da vuelta: ahí el corte de regalo
+            <em>sí</em> sirve — llena hueco — la lista de espera pesa mucho más, y el argumento de venta
+            pasa a ser ocupación y no escasez.
+          </p>
+          <p>
+            Por eso el <strong>constructor de planes configurable</strong> no es un lujo: es lo que
+            permite que el mismo producto sirva para una barbería llena y para una vacía sin tocar código.
+            Lo que cambia entre una y otra es qué plan arma el barbero, no el software.
+          </p>
+
+          <h3>Diferido</h3>
+          <p>
+            Onboarding self-service, cobro del SaaS a cada barbería, subdominios o branding por local,
+            y roles dentro de una barbería con varios barberos. Nada de eso bloquea el piloto.
+          </p>
+        </div>
+      </section>
+
+      <!-- PENDIENTE -->
+      <section id="pendiente">
+        <div class="head">
+          <h2>Decisiones abiertas</h2>
+          <span class="chip warn">Tuyas</span>
+        </div>
+        <div class="rules">
+          <div class="rule">
+            <div class="k">Tope de slots prime reservados <span class="chip warn">Decidir</span></div>
+            <div class="v">La escasez que hace valioso el plan corta para los dos lados: cada slot prime bloqueado achica el pool para los no-suscriptores, que son la mayoría de la facturación de hoy. Diez viernes-19hs bloqueados y el resto de la clientela nunca más consigue horario bueno.<br><b>Propuesta:</b> ≤ 20–30% de la capacidad prime (30–45 de 151 slots/mes), y considerar excluir viernes y sábado noche de la reserva permanente, o cobrarlos aparte. Setting del barbero, no hardcode.</div>
+          </div>
+          <div class="rule">
+            <div class="k">Ventana de cancelación — las X horas <span class="chip warn">Decidir</span></div>
+            <div class="v">¿Cuántas horas antes se puede cancelar y recuperar el crédito? Fuera de esa ventana, el crédito se consume. El no-show también consume crédito — eso <b>es</b> el breakage, hecho explícito. El mismo número gobierna la confirmación del slot retenido.</div>
+          </div>
+          <div class="rule">
+            <div class="k">Gracia por falta de pago <span class="chip warn">Decidir</span></div>
+            <div class="v">Si no renueva el martes: ¿pierde el slot retenido de inmediato, o mantiene la prioridad una semana más sin crédito? La versión con gracia retiene mejor; la sin gracia libera antes un slot prime que se vende solo.</div>
+          </div>
+          <div class="rule">
+            <div class="k">Recordatorio de WhatsApp <span class="chip warn">Decidir</span></div>
+            <div class="v">Si los no-suscriptores agendan en tu app, el barbero abandona Turnito el día 1 — y entonces lo único que Turnito tiene (recordatorio 2h antes) pasa a ser requisito v1. WhatsApp Business API = onboarding con Meta, aprobación de templates, costo por mensaje.<br><b>Recomendado para el piloto:</b> app solo para suscriptores, los no-suscriptores siguen en Turnito. El barbero corre dos sistemas un mes. Feo, pero testea el negocio en semanas y no en meses.</div>
+          </div>
+          <div class="rule">
+            <div class="k">Precio final del plan <span class="chip warn">Del barbero</span></div>
+            <div class="v">Sin descuento es la recomendación. <b>No fondees tus 50.000 con un premium de 5.000 × 10 suscriptores</b>: eso es toda la ganancia del barbero yendo a tu bolsillo mientras él trabaja horas extra por cero cash. No es una venta.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PREGUNTAS -->
+      <section id="preguntas">
+        <div class="head">
+          <h2>Preguntas al barbero</h2>
+          <span class="chip warn">Abiertas</span>
+        </div>
+        <div class="rules q">
+          <div class="rule">
+            <div class="k">¿Está dispuesto a venir 2 horas antes?</div>
+            <div class="v">Es su tiempo libre. <span class="why">Si dice que no, el corte valle no existe y el plan queda solo como horario garantizado — sigue siendo vendible, pero se cae la ventana de ingreso nueva que justifica los 50.000.</span></div>
+          </div>
+          <div class="rule">
+            <div class="k">“Menos de 5 cancelaciones tardías”: ¿por semana o por mes?</div>
+            <div class="v"><span class="why">Cambia un orden de magnitud en cuánta hora muerta hay para recuperar con la lista de espera.</span></div>
+          </div>
+          <div class="rule">
+            <div class="k">¿Efectivamente cobra la penalidad de no-show?</div>
+            <div class="v"><span class="why">Política declarada ≠ política aplicada. El hueco entre las dos es exactamente donde la lista de espera se gana el sueldo.</span></div>
+          </div>
+          <div class="rule">
+            <div class="k">¿La hora plana aplica también a barba?</div>
+            <div class="v"><span class="why">Si corte+barba son 1,5h y no 1h, la palanca de “correr el mix hacia arriba” se invierte y plan 2 deja de ser el mejor producto.</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIESGOS -->
+      <section id="riesgos">
+        <div class="head">
+          <h2>Riesgos</h2>
+        </div>
+        <div class="scroll">
+          <table>
+            <thead>
+              <tr><th class="lbl">Riesgo</th><th>Mitigación</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Canje valle ≈ 0</strong><br>Nadie puede ir un martes 13hs.</td>
+                <td>El plan igual se sostiene con el horario garantizado. Pero no armar el pitch sobre el corte gratis.</td>
+              </tr>
+              <tr>
+                <td><strong>El semanal confiable no genera margen</strong><br>El vencimiento semanal solo paga cuando el cliente falta.</td>
+                <td>Apuntar al semanal aspiracional (llega a 3 de 4). Con el confiable, el ingreso del plan es neutro por diseño — la ganancia es prepago y retención.</td>
+              </tr>
+              <tr>
+                <td><strong>El vencimiento semanal se siente punitivo</strong><br>Pagó y perdió la semana.</td>
+                <td>El corte extra es exactamente la compensación. Tiene que estar visible en la venta, no en la letra chica.</td>
+              </tr>
+              <tr>
+                <td><strong>Resentimiento de los no-suscriptores</strong><br>Los horarios buenos quedan bloqueados.</td>
+                <td>Tope configurable de slots reservados; excluir viernes y sábado noche.</td>
+              </tr>
+              <tr>
+                <td><strong>Turnos falsos</strong><br>Formulario público sin verificación.</td>
+                <td>Rate-limit por teléfono, o estado “pendiente” hasta confirmación del barbero.</td>
+              </tr>
+              <tr>
+                <td><strong>Regresión vs. Turnito</strong><br>Se pierde el recordatorio de WhatsApp.</td>
+                <td>Piloto solo-suscriptores; Turnito sigue vivo para el resto.</td>
+              </tr>
+              <tr>
+                <td><strong>Inflación</strong><br>Precio recurrente en ARS.</td>
+                <td>Auto-repricing de planes + aviso a suscriptores + respetar el ciclo en curso. Los incumbentes globales lo manejan mal — es el diferenciador local más fuerte.</td>
+              </tr>
+              <tr>
+                <td><strong>El barbero está subvaluado</strong><br>100% de ocupación sostenida sin esfuerzo.</td>
+                <td>No es problema de software, pero es la respuesta honesta a “cómo gano más”. Decirlo una vez compra credibilidad para el resto.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- NEXT -->
+      <section id="next">
+        <div class="head">
+          <h2>Próximo paso</h2>
+        </div>
+        <div class="verdict">
+          <p class="lead">Piloto sin código, un mes.</p>
+          <p>
+            Link de pago + planilla + WhatsApp. 5 suscriptores. Medir tres cosas:
+            <strong>cuántas semanas se pierden</strong> (es el motor de margen),
+            <strong>tasa de canje del corte valle</strong>, y <strong>si los suscriptores realmente
+            se auto-agendan</strong>. La métrica de éxito no es facturar más — con clientes ya
+            semanales el ingreso es plano por diseño. Es probar la mecánica y la adherencia al prepago.
+          </p>
+          <p>
+            Si el barbero no lo vende a mano, el software no lo va a arreglar. Después se construye.
+          </p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <footer>
+    <span>Turno Fijo</span>
+    <span>Análisis de viabilidad</span>
+    <span>Última revisión: septiembre 2026</span>
+  </footer>
+</div>
